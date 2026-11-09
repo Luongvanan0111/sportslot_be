@@ -1,0 +1,22 @@
+# Python & Virtualenv
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Environment & Secrets
+.env
+*.env
+
+# Testing & Quality Tools
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
