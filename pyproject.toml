@@ -8,10 +8,12 @@ dependencies = [
     "alembic>=1.20.1",
     "apscheduler>=3.11.3",
     "asyncpg>=0.32.0",
+    "cloudinary>=1.47.0",
     "fastapi[standard]>=0.162.2",
     "pwdlib[argon2]>=0.3.1",
     "pydantic-settings>=2.16.2",
     "pyjwt>=2.15.1",
+    "python-multipart>=0.0.33",
     "sqlalchemy[asyncio]>=2.1.8",
     "uuid-utils>=1.2.0",
 ]
@@ -25,6 +27,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "aiosqlite>=0.22.1",
     "httpx>=0.28.1",
     "mypy>=2.4.1",
     "pytest>=9.2.0",

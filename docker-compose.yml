@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sportslot_postgres
+    environment:
+      POSTGRES_USER: sportslot
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: sportslot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
