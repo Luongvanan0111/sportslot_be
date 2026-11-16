@@ -5,11 +5,12 @@ Import `settings` ở bất kỳ đâu để truy cập: `from app.core.config i
 """
 
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Cấu hình các biến môi trường hiện có của dự án."""
+    """Cấu hình các biến môi trường của dự án."""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -17,6 +18,9 @@ class Settings(BaseSettings):
         extra="ignore",
         case_sensitive=False,
     )
+
+    # --- Ứng dụng ---
+    app_name: str = "SportSlot Backend API"
 
     # --- Database ---
     database_url: str = ""
@@ -33,8 +37,19 @@ class Settings(BaseSettings):
     cloudinary_api_key: str = ""
     cloudinary_api_secret: str = ""
 
+    # --- CORS ---
+    cors_origins: str = "http://localhost:3000"
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        """Tách chuỗi các domain CORS thành danh sách list."""
+        return [
+            origin.strip() for origin in self.cors_origins.split(",") if origin.strip()
+        ]
+
     @property
     def DATABASE_URL(self) -> str:
+        """Tương thích với alembic/env.py."""
         return self.database_url
 
 
@@ -44,4 +59,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-
