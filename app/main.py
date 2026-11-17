@@ -6,9 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from app.core.config import settings
+from app.core.database import async_session_factory
+from app.core.exceptions import register_exception_handlers
 from app.core.logging import init_logger_file, logger
 from app.core.middlewares import log_requests_middleware
 from app.core.service_checker import check_all_services
+from app.db.seed import seed_all_data
+from app.routers.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -24,6 +28,14 @@ async def lifespan(app: FastAPI):
     services_status = await check_all_services()
     app.state.services_status = services_status
 
+    # Tự động seed dữ liệu mẫu khi Database đã kết nối
+    if services_status.get("database") == "connected":
+        try:
+            async with async_session_factory() as session:
+                await seed_all_data(session)
+        except Exception as e:
+            logger.error(f"[STARTUP] Lỗi trong quá trình seed dữ liệu: {e}")
+
     logger.info("=" * 50)
     yield
 
@@ -34,6 +46,9 @@ app = FastAPI(
     docs_url="/docs",
     lifespan=lifespan,
 )
+
+# Đăng ký các bộ xử lý lỗi thống nhất (AppError, ValidationError, Exception)
+register_exception_handlers(app)
 
 # Đăng ký middleware ghi log request/response
 app.middleware("http")(log_requests_middleware)
@@ -46,6 +61,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Đăng ký các Router nghiệp vụ
+app.include_router(auth_router)
 
 
 @app.get("/", include_in_schema=False)
