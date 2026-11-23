@@ -65,11 +65,24 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         """Tách chuỗi các domain CORS thành danh sách list."""
+        default_origins = [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:5174",
+            "http://127.0.0.1:5174",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "https://localhost:3000",
+        ]
         if not self.cors_origins:
-            return ["*"]
-        return [
+            return default_origins
+        configured = [
             origin.strip() for origin in self.cors_origins.split(",") if origin.strip()
         ]
+        for o in default_origins:
+            if o not in configured:
+                configured.append(o)
+        return configured
 
     @property
     def DATABASE_URL(self) -> str:

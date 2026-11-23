@@ -59,7 +59,7 @@ async def log_requests_middleware(request: Request, call_next):
                     data = json.loads(response_body.decode("utf-8"))
                     if isinstance(data, dict):
                         msg_text = str(data.get("message") or data.get("detail") or "")
-                except json.JSONDecodeError, UnicodeDecodeError:
+                except (json.JSONDecodeError, UnicodeDecodeError):
                     pass
 
                 log_line = f"API {method} {path} | Status: {status_str} | Time: {duration_ms:.2f}ms | Client: {client_ip}"

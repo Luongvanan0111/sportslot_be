@@ -83,3 +83,27 @@ class UserRepository:
         self.db.add(refresh_token)
         await self.db.flush()
         return refresh_token
+
+    async def get_refresh_token_by_hash(self, token_hash: str) -> RefreshToken | None:
+        """Tìm kiếm RefreshToken theo chuỗi băm."""
+        stmt = select(RefreshToken).where(RefreshToken.token_hash == token_hash)
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def revoke_refresh_token(self, token_record: RefreshToken) -> None:
+        """Thu hồi một RefreshToken bằng cách gán thời điểm revoked_at."""
+        token_record.revoked_at = now_vn()
+        await self.db.flush()
+
+    async def revoke_user_refresh_tokens(self, user_id: int) -> None:
+        """Thu hồi toàn bộ RefreshToken còn hiệu lực của người dùng."""
+        stmt = select(RefreshToken).where(
+            RefreshToken.user_id == user_id,
+            RefreshToken.revoked_at.is_(None),
+        )
+        result = await self.db.execute(stmt)
+        tokens = result.scalars().all()
+        now = now_vn()
+        for t in tokens:
+            t.revoked_at = now
+        await self.db.flush()

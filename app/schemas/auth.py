@@ -18,6 +18,25 @@ class SignInRequest(BaseModel):
     )
 
 
+class RefreshTokenRequest(BaseModel):
+    """Schema dữ liệu đầu vào cho yêu cầu làm mới access token."""
+
+    refresh_token: str = Field(
+        ...,
+        min_length=1,
+        description="Chuỗi Refresh Token cần làm mới",
+    )
+
+
+class LogoutRequest(BaseModel):
+    """Schema dữ liệu đầu vào tùy chọn khi đăng xuất."""
+
+    refresh_token: str | None = Field(
+        default=None,
+        description="Chuỗi Refresh Token cụ thể cần thu hồi (tùy chọn)",
+    )
+
+
 class UserProfileResponse(BaseModel):
     """Schema thông tin hồ sơ rút gọn trả về kèm User."""
 
@@ -48,8 +67,9 @@ class UserAuthResponse(BaseModel):
 
 
 class SignInResponseData(BaseModel):
-    """Cấu trúc dữ liệu trường data trong phản hồi đăng nhập."""
+    """Cấu trúc dữ liệu trường data trong phản hồi đăng nhập và làm mới token."""
 
     access_token: str
     refresh_token: str
+    token_type: str = "Bearer"
     user: UserAuthResponse

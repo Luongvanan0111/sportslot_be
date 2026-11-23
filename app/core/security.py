@@ -7,6 +7,7 @@ from pwdlib import PasswordHash
 
 from app.core.config import settings
 from app.core.exceptions import UnauthorizedError
+from app.core.messages import AuthMsg
 from app.utils.timezone import now_vn
 
 # Quản lý băm mật khẩu với thuật toán Argon2id chuẩn hóa
@@ -69,9 +70,9 @@ def decode_token(token: str) -> dict[str, Any]:
             algorithms=[settings.algorithm],
         )
     except jwt.ExpiredSignatureError:
-        raise UnauthorizedError("Token has expired")
+        raise UnauthorizedError(AuthMsg.TOKEN_EXPIRED)
     except jwt.InvalidTokenError:
-        raise UnauthorizedError("Invalid token")
+        raise UnauthorizedError(AuthMsg.TOKEN_INVALID)
 
 
 def hash_token(token: str) -> str:

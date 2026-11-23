@@ -53,13 +53,15 @@ register_exception_handlers(app)
 # Đăng ký middleware ghi log request/response
 app.middleware("http")(log_requests_middleware)
 
-# Cấu hình CORS
+# Cấu hình CORS (cho phép frontend trên localhost / 127.0.0.1 ở bất kỳ cổng nào truy cập)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:[0-9]+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Đăng ký các Router nghiệp vụ

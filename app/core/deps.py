@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.exceptions import ForbiddenError, UnauthorizedError
+from app.core.messages import AuthMsg
 from app.core.security import decode_token
 from app.models.user import User
 from app.repositories.role_repo import RoleRepository
@@ -28,7 +29,7 @@ async def get_current_user(
 ) -> User:
     """Dependency xác thực JWT Bearer Token và trả về thông tin User hiện tại."""
     if not token:
-        raise UnauthorizedError("Not authenticated")
+        raise UnauthorizedError(AuthMsg.NOT_AUTHENTICATED)
 
     payload = decode_token(token)
     if payload.get("type") != "access":
@@ -46,10 +47,10 @@ async def get_current_user(
     user_repo = UserRepository(db)
     user = await user_repo.get_by_id(user_id)
     if not user:
-        raise UnauthorizedError("User does not exist")
+        raise UnauthorizedError(AuthMsg.USER_NOT_FOUND)
 
     if user.status == UserStatus.BANNED.value:
-        raise ForbiddenError("Account has been banned")
+        raise ForbiddenError(AuthMsg.ACCOUNT_BANNED)
 
     return user
 
